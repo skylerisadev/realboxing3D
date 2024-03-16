@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VHVNHMYGN3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VHVNHMYGN3');
+  </script>
+  <title>Redirect Page</title>
+  <style>
+    /* CSS for centering and styling the loading message */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    #loading-message {
+      font-size: 24px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-message">Please wait, loading game...</div>
+
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.location.href = "/game/game.html"; 
+      }, 5000); // 5000 milliseconds = 5 seconds
+    };
+  </script>
+</body>
+</html>

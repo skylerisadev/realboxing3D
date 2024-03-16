@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Boxing 3D - 2 Player</title>
+<style>
+  body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #222;
+      margin: 0;
+  }
+
+  canvas {
+      width: 400px;
+      height: 300px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .health-bar-container {
+      text-align: center;
+      margin-bottom: 10px;
+  }
+
+  .health-bar {
+      width: 150px;
+      height: 15px;
+      background-color: #ddd;
+      border-radius: 5px;
+      margin: 5px auto;
+      overflow: hidden;
+  }
+
+  .health-bar-inner {
+      height: 100%;
+      background-color: #5cb85c;
+  }
+</style>
+</head>
+<body>
+<div class="health-bar-container">
+    <p>Player One</p>
+    <div id="player1HealthBar" class="health-bar">
+        <div id="player1HealthBarInner" class="health-bar-inner"></div>
+    </div>
+</div>
+<div class="health-bar-container">
+    <p>Player Two</p>
+    <div id="player2HealthBar" class="health-bar">
+        <div id="player2HealthBarInner" class="health-bar-inner"></div>
+    </div>
+</div>
+<canvas id="gameCanvas" width="800" height="600"></canvas>
+<script>
+    // Get canvas element and its context
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Define player positions
+    let player1X = 50;
+    let player2X = 700;
+
+    // Define player sizes
+    const playerHeight = 100;
+
+    // Define player speed
+    const playerSpeed = 5;
+
+    // Define players' health
+    let player1Health = 100;
+    let player2Health = 100;
+
+    // Draw function
+    function draw() {
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw player 1 stick figure
+        drawStickFigure(player1X, canvas.height / 2 - playerHeight / 2, 'blue');
+
+        // Draw player 2 stick figure
+        drawStickFigure(player2X, canvas.height / 2 - playerHeight / 2, 'red');
+
+        // Draw health bars
+        drawHealthBar('player1HealthBarInner', player1Health);
+        drawHealthBar('player2HealthBarInner', player2Health);
+    }
+
+    // Draw stick figure function
+    function drawStickFigure(x, y, color) {
+        // Head
+        ctx.beginPath();
+        ctx.arc(x, y - 30, 15, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.closePath();
+
+        // Body
+        ctx.beginPath();
+        ctx.moveTo(x, y - 15);
+        ctx.lineTo(x, y + 35);
+        ctx.strokeStyle = color;
+        ctx.stroke();
+        ctx.closePath();
+
+        // Arms
+        ctx.beginPath();
+        ctx.moveTo(x - 20, y);
+        ctx.lineTo(x + 20, y);
+        ctx.strokeStyle = color;
+        ctx.stroke();
+        ctx.closePath();
+
+        // Legs
+        ctx.beginPath();
+        ctx.moveTo(x - 10, y + 35);
+        ctx.lineTo(x, y + 60);
+        ctx.lineTo(x + 10, y + 35);
+        ctx.strokeStyle = color;
+        ctx.stroke();
+        ctx.closePath();
+
+        // Shading for depth
+        ctx.beginPath();
+        ctx.moveTo(x - 10, y + 35);
+        ctx.lineTo(x - 5, y + 45);
+        ctx.strokeStyle = '#666';
+        ctx.stroke();
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.moveTo(x + 10, y + 35);
+        ctx.lineTo(x + 5, y + 45);
+        ctx.strokeStyle = '#666';
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    // Draw health bar function
+    function drawHealthBar(elementId, health) {
+        const bar = document.getElementById(elementId);
+        bar.style.width = health + '%';
+    }
+
+    // Update function
+    function update() {
+        // Move player 1 left (A key)
+        if (keys[65]) {
+            player1X -= playerSpeed;
+        }
+
+        // Move player 1 right (D key)
+        if (keys[68]) {
+            player1X += playerSpeed;
+        }
+
+        // Move player 2 left (Left arrow key)
+        if (keys[37]) {
+            player2X -= playerSpeed;
+        }
+
+        // Move player 2 right (Right arrow key)
+        if (keys[39]) {
+            player2X += playerSpeed;
+        }
+
+        // Check collision and decrease health if players hit each other
+        if (Math.abs(player1X - player2X) < 20) {
+            player1Health -= 1;
+            player2Health -= 1;
+        }
+
+        // Check for out-of-bounds and reset positions
+        if (player1X < 0) {
+            player1X = 0;
+        } else if (player1X > canvas.width - 20) {
+            player1X = canvas.width - 20;
+        }
+
+        if (player2X < 0) {
+            player2X = 0;
+        } else if (player2X > canvas.width - 20) {
+            player2X = canvas.width - 20;
+        }
+
+        // Check for game over
+        if (player1Health <= 0 || player2Health <= 0) {
+            alert('Game Over!');
+            resetGame();
+        }
+    }
+
+    // Reset game function
+    function resetGame() {
+        player1X = 50;
+        player2X = 700;
+        player1Health = 100;
+        player2Health = 100;
+    }
+
+    // Game loop
+    function gameLoop() {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+
+    // Key state tracking
+    const keys = {};
+
+    // Event listeners for keydown and keyup events
+    document.addEventListener('keydown', event => {
+        keys[event.keyCode] = true;
+    });
+
+    document.addEventListener('keyup', event => {
+        keys[event.keyCode] = false;
+    });
+
+    // Start the game loop
+    gameLoop();
+</script>
+</body>
+</html>
